@@ -42,8 +42,8 @@ while(<>){
 }
 
 print("\n\n\n");
-foreach my $k (keys %poems) {
-  for my $c (@{$poems{$k}}) {
+foreach my $k (sort keys %poems) {
+  for my $c (sort @{$poems{$k}}) {
     print("$c\n\n\n");
   }
 }

@@ -51,9 +51,9 @@ sub print_item {
   $toc_pdf_string =~ s/\[.*?\]//g;
 
   my $toc_title = "{$title\\dotfill{} $author}";
-  $toc_title =~ s/【.*】//;
+  #$toc_title =~ s/【.*】//;
   $toc_title =~ s/\[.*?\]//g;
-  $toc_title = '\texorpdfstring{\makebox[8cm]' . $toc_title . "}{$toc_pdf_string}";
+  $toc_title = '\texorpdfstring{\makebox[10cm]' . $toc_title . "}{$toc_pdf_string}";
   $output =~ s/<TOCTITLE>/$toc_title/e;
 
   $title =~ s/(...)\[([^ ]*?)\]/replace_pinyin1($1, $2)/egs;
