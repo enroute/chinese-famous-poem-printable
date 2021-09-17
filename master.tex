@@ -1,0 +1,647 @@
+\documentclass[a4paper,12pt,book]{memoir}
+
+% remove marginnote space for book class in memoir
+% \usepackage[nomarginpar]{geometry}
+% remove margin note space
+% \setlength{\marginparwidth}{0pt}
+
+% NOT WORK!
+% \setmarginnotes{1pt}{1pt}{1pt}
+
+% set margin
+% \setlrmarginsandblock{left}{right}{ratio}
+% \setulmarginsandblock{top}{bottom}{ratio}
+\setlrmarginsandblock{3.5cm}{3.5cm}{*}
+\setulmarginsandblock{3.5cm}{*}{1}
+\checkandfixthelayout 
+
+%% To fix a bug in TeXLive 2018, ref.
+%% https://tex.stackexchange.com/questions/427451/dot-between-chapter-number-and-figure-number-disapear-after-update
+%% https://tex.stackexchange.com/questions/427995/memoir-on-tex-live-2018-breaks-figure-numbering-after-mainmatter
+\makeatletter
+\renewcommand{\counterwithin}{\@ifstar{\@csinstar}{\@csin}}
+\makeatother
+
+% comment this if don't want to show answer
+\def\withanswer{1}
+
+% Make different footmark reference the same footnote
+\makeatletter
+\newcommand\footnoteref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
+\makeatother
+
+% Turn on subsection numbering in memoir class
+\setsecnumdepth{subsection}
+
+\usepackage{pbox}
+\usepackage{xpinyin}
+\usepackage{metalogo}           %for \XeTeX, \XeLaTeX, \LuaTeX and \LuaLaTeX
+
+%%% \DeclareUnicodeCharacter not compatible with xelatex
+% \usepackage[utf8]{inputenc}
+% \DeclareUnicodeCharacter{1F019}{\yibing}
+% \DeclareUnicodeCharacter{1F01A}{\erbing}
+% \DeclareUnicodeCharacter{1F01B}{\sanbing}
+% \newcommand{\yibing}{\symbol{"1F019}}
+% \newcommand{\yibing}{\fontfamily{Symbola}\selectfont\DeclareUnicodeCharacter{1F019}{kk}}
+
+% Ref. Mahjong tiles in unicode: http://www.unicode.org/charts/PDF/U1F000.pdf
+% Symbola font is one of those fonts that implements the mahjong range in unicode
+\newcommand{\mahjongsymbol}[1]{\begingroup\Huge\setmainfont{Symbola}%
+  \rule[-.3\baselineskip]{0pt}{\baselineskip}%strut to ensure the height
+  \symbol{"#1}\endgroup}
+\newcommand{\mjbing}[1]{
+  \ifthenelse{#1=1}{\mahjongsymbol{1F019}}{% 1 bing
+    \ifthenelse{#1=2}{\mahjongsymbol{1F01A}}{% 2 bing
+      \ifthenelse{#1=3}{\mahjongsymbol{1F01B}}{% 3 bing
+        \ifthenelse{#1=4}{\mahjongsymbol{1F01C}}{% 4 bing
+          \ifthenelse{#1=5}{\mahjongsymbol{1F01D}}{% 5 bing
+            \ifthenelse{#1=6}{\mahjongsymbol{1F01E}}{% 6 bing
+              \ifthenelse{#1=7}{\mahjongsymbol{1F01F}}{% 7 bing
+                \ifthenelse{#1=8}{\mahjongsymbol{1F020}}{% 8 bing
+                  \ifthenelse{#1=9}{\mahjongsymbol{1F021}}{% 9 bing
+                  }}}}}}}}}}
+  
+\newcommand{\yibing}{\mjbing1}
+\newcommand{\erbing}{\mjbing2}
+\newcommand{\sanbing}{\mjbing3}
+\newcommand{\sibing}{\mjbing4}
+\newcommand{\wubing}{\mjbing5}
+% \newcommand{\yibing}{\mahjongsymbol{1F019}}
+% \newcommand{\erbing}{\mahjongsymbol{1F01A}}
+% \newcommand{\sanbing}{\mahjongsymbol{1F01B}}
+% \newcommand{\sibing}{\mahjongsymbol{1F01C}}
+% \newcommand{\wubing}{\mahjongsymbol{1F01D}}
+
+% \newcommand{\yibing}{\begingroup\Huge\setmainfont{Symbola}\symbol{"1F019}\endgroup}
+% \newcommand{\erbing}{\begingroup\Huge\setmainfont{Symbola}\symbol{"1F01A}\endgroup}
+% \newcommand{\sanbing}{\begingroup\Huge\setmainfont{Symbola}\symbol{"1F01B}\endgroup}
+% \newcommand{\sibing}{\begingroup\Huge\setmainfont{Symbola}\symbol{"1F01C}\endgroup}
+% \newcommand{\wubing}{\begingroup\Huge\setmainfont{Symbola}\symbol{"1F01D}\endgroup}
+
+%% subfigure is obsolete and conilict with tocloft package, use subcaption or subfig insted
+% \usepackage{subfigure}
+% \usepackage[subfigure]{tocloft}
+% \PassOptionsToPackage{subfigure}{tocloft}
+\usepackage{subcaption}
+
+% toc style
+\usepackage{titletoc}% http://ctan.org/pkg/titletoc
+\setcounter{tocdepth}{2}% Display up to \subsection in ToC
+% \titlecontents*{section}% <section>
+\titlecontents*{subsection}% <section>
+  [3.8em]% <left>
+  {\small}% <above-code>
+  {}% <numbered-entry-format>; you could also use {\thecontentslabel. } to show the numbers
+  {}% <numberless-entry-format>
+  {\ \thecontentspage}% <filler-page-format>
+  [,\ \ \ \ ]% <separator>
+  []% <end>
+
+% For epigraphs
+\usepackage{epigraph}
+
+% Use varwidth to make epigraph length adaptive
+\usepackage{varwidth}
+\renewcommand{\epigraphsize}{\normalsize}
+\setlength{\epigraphwidth}{0.8\textwidth}
+\renewcommand{\textflush}{flushright}
+\renewcommand{\sourceflush}{flushright}
+% A useful addition
+\newcommand{\epitextfont}{\kai}
+\newcommand{\episourcefont}{\kai}
+
+\makeatletter
+\newsavebox{\epi@textbox}
+\newsavebox{\epi@sourcebox}
+\newlength\epi@finalwidth
+\renewcommand{\epigraph}[2]{%
+  \vspace{\beforeepigraphskip}
+  {\epigraphsize\begin{\epigraphflush}
+   \epi@finalwidth=\z@
+   \sbox\epi@textbox{%
+     \varwidth{\epigraphwidth}
+     \begin{\textflush}\epitextfont#1\end{\textflush}
+     \endvarwidth
+   }%
+   \epi@finalwidth=\wd\epi@textbox
+   \sbox\epi@sourcebox{%
+     \varwidth{\epigraphwidth}
+     \begin{\sourceflush}\episourcefont#2\end{\sourceflush}%
+     \endvarwidth
+   }%
+   \ifdim\wd\epi@sourcebox>\epi@finalwidth 
+     \epi@finalwidth=\wd\epi@sourcebox
+   \fi
+   \leavevmode\vbox{
+     \hb@xt@\epi@finalwidth{\hfil\box\epi@textbox}
+     \vskip1.75ex
+     \hrule height \epigraphrule
+     \vskip.75ex
+     \hb@xt@\epi@finalwidth{\hfil\box\epi@sourcebox}
+   }%
+   \end{\epigraphflush}
+   \vspace{\afterepigraphskip}}}
+\makeatother
+
+%%% check mark and x mark
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+% \newcommand{\xmark}{\ding{55}}%
+\newcommand{\xmark}{\times}
+\newcommand{\redcross}{{\color{red}\ding{53}}}
+
+\newcommand*\numcircled[1]{\raisebox{.5pt}{\textcircled{\raisebox{-.9pt} {#1}}}}
+
+
+\usepackage[xetex,
+            bookmarksnumbered=true,
+            bookmarksopen=true,
+            colorlinks=false,
+            pdfborder={0 0 1},
+            citecolor=blue,
+            linkcolor=red,
+            anchorcolor=green,
+            urlcolor=blue,
+            breaklinks=true,
+            naturalnames  %与algorithm2e宏包协调
+            ]{hyperref}
+
+% For Chinese fonts
+% \usepackage{fontspec}
+% \setmainfont{SimSun}
+% \usepackage[AutoFakeBold,SlantFont]{xeCJK}
+% % \usepackage[SlantFont]{xeCJK}   %AutoFakeBold=true makes CJK characters in the generated PDF can't be copied
+
+% \setCJKmainfont{SimSun}
+
+%%% DON'T USE AutoFakeBold, or issues will arise:
+%%% https://tex.stackexchange.com/questions/266894/titlesec-autofakebold-making-pdf-figures-bold
+%%% https://stackoverflow.com/questions/4422054/why-is-latex-making-my-caption-bold
+%%% Use the following font setting instead:
+%%% https://www.jianshu.com/p/b1751078e28e
+\usepackage{xeCJK}
+\setCJKmainfont[ItalicFont={楷体}, BoldFont={黑体}]{宋体}%衬线字体 缺省中文字体为
+\setCJKsansfont{黑体}
+\setCJKmonofont{仿宋_GB2312}%中文等宽字体
+
+
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{ulem}               % For \sout, \uwave
+\usepackage[usenames,dvipsnames]{pstricks}
+\usepackage{pstricks-add}  % For \psrotate, \psbrace
+\usepackage{epsfig}
+\usepackage{pst-grad} % For gradients
+\usepackage{pst-plot} % For axes
+\usepackage{pst-node} % For nodes
+\usepackage[space]{grffile} % For spaces in paths
+\usepackage{etoolbox} % For spaces in paths
+\AtBeginEnvironment{quote}{\kai\small} %for quote environment
+\AtBeginEnvironment{quotation}{\kai\small} %for quotation environment
+\patchcmd{\quotation}{1.5em}{2em}{}{}
+
+\usepackage{pst-eucl}
+
+\usepackage[english]{babel}     % For enquote
+\usepackage{csquotes} 
+
+\usepackage{tabularx}
+\usepackage{colortbl}
+% \usepackage[table]{xcolor}      %this will load colortbl package, for the \cellcolor
+
+\usepackage{hhline}
+% from color package?
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+
+\usepackage{booktabs}       % 表格，横的粗线；\specialrule{1pt}{0pt}{0pt}, not compactible with vertical line
+\usepackage{boldline}       % for \hlineB, bold horizontal lines compactable with vertical line
+
+\usepackage{tikzpeople}
+\usepackage{tikz,fp}
+% \usetikzlibrary{angles}         % for perpendicular symbols
+\usetikzlibrary{calc,intersections,patterns,angles,quotes,shapes}           %
+\usepackage{tikz-3dplot}
+\usetikzlibrary{positioning}    % right=of (SHAPE)
+\usetikzlibrary{3d}
+\usetikzlibrary{decorations.markings} %for decorate, arrow in the middle of a line
+\usetikzlibrary{decorations.text}     %for text along a path
+\usetikzlibrary{through}              %for [circle through] in \node
+\usetikzlibrary{arrows.meta}          %for arrow options
+\usetikzlibrary{shadings}             %for shadings
+
+%% externalizing tikz graphs
+%% https://tex.stackexchange.com/questions/1460/script-to-automate-externalizing-tikz-graphics
+% \usetikzlibrary{external}
+% \tikzexternalize[prefix=figures/]
+
+\newcommand{\tikzmark}[2]{\tikz[overlay,remember picture,baseline] \node [anchor=base] (#1) {$#2$};}
+
+\newcommand{\DrawVLine}[3][black, thick, opacity=0.5]{%
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw[shorten <=0.3ex, #1] (#2.north) -- (#3.south);
+  \end{tikzpicture}
+}
+
+\newcommand{\DrawHLine}[3][black, thick, opacity=0.5]{%
+  \begin{tikzpicture}[overlay,remember picture]
+    \draw[shorten <=0.2em, #1] (#2.west) -- (#3.east);
+  \end{tikzpicture}
+}
+
+\usepackage{tkz-euclide} % for perpendicular symbols, \tkzMarkRightAngle, \tkzDefPoint
+\usetkzobj{all}
+
+% default style
+\tikzset{every picture/.style={line join=round}}
+
+\makeatletter
+\def\calcLength(#1,#2)#3{%
+  \pgfpointdiff{\pgfpointanchor{#1}{center}}%
+               {\pgfpointanchor{#2}{center}}%
+  \pgf@xa=\pgf@x%
+  \pgf@ya=\pgf@y%
+  \FPeval\@temp@a{\pgfmath@tonumber{\pgf@xa}}%
+  \FPeval\@temp@b{\pgfmath@tonumber{\pgf@ya}}%
+  \FPeval\@temp@sum{(\@temp@a*\@temp@a+\@temp@b*\@temp@b)}%
+  \FProot{\FPMathLen}{\@temp@sum}{2}%
+  \FPround\FPMathLen\FPMathLen5\relax
+  \global\expandafter\edef\csname #3\endcsname{\FPMathLen}
+}
+
+\def\drawArc(#1,#2,#3){%
+  \pgfmathanglebetweenpoints{\pgfpointanchor{#1}{center}}{\pgfpointanchor{#2}{center}}
+  \let\StartAngle\pgfmathresult
+  \pgfmathanglebetweenpoints{\pgfpointanchor{#1}{center}}{\pgfpointanchor{#3}{center}}
+  \let\EndAngle\pgfmathresult
+  \calcLength(#1,#2){myr@dius}
+  \draw (#2) arc[start angle=\StartAngle, end angle=\EndAngle, radius=\myr@dius pt];
+}
+
+% tikz command to draw arc with center
+\def\centerarc[#1](#2)(#3:#4:#5)% Syntax: [draw options] (center) (initial angle:final angle:radius)
+{ \draw[#1] ($(#2)+({#5*cos(#3)},{#5*sin(#3)})$) arc (#3:#4:#5); }
+\makeatother
+
+\usepackage{pgfplots}           % for polor plot
+\usepgfplotslibrary{polar}
+% Change to 1.16, since the following output from xelate:
+% Package pgfplots notification 'compat/show suggested version=true': you might b
+% enefit from \pgfplotsset{compat=1.16} (current compat level: 1.8).
+% \pgfplotsset{compat=1.14}
+
+
+\makeatletter % For spaces in paths
+    \patchcmd\Gread@eps{\@inputcheck#1 }{\@inputcheck"#1"\relax}{}{}
+
+    % Font of theorem subtitle
+    \def\th@plain{%
+      \thm@notefont{}% same as heading font
+      \kai % body font
+    }
+    \def\th@definition{%
+      \thm@notefont{}% same as heading font
+      % \bfseries \kai % body font
+      \bfseries \hei % body font
+    }
+\makeatother
+
+\def\answer#1{
+  \ifx\withanswer\undefined\else 提示：\par\nopagebreak #1\fi
+}
+
+\usepackage{mathtools,amsthm,amsfonts,amssymb,bm}
+% For \notdivides which has a negating line longer than \nmid in the
+% `amssymb' package and shorter than the \centernot in the `centernot'
+% package.
+\usepackage{mathabx}
+
+\usepackage{extarrows}          % for xlongequal
+% use `fc-list|grep -i kai' to get installed font list
+\setCJKfamilyfont{kai}{KaiTi}
+\setCJKmonofont{NSimSun}
+\newcommand{\kai}{\CJKfamily{kai}}
+\newcommand{\hei}{\CJKfamily{hei}}
+
+%% chapter style
+% \usepackage{titlesec, blindtext, color}
+% \definecolor{gray75}{gray}{0.75}
+% \newcommand{\hsp}{\hspace{20pt}}
+% \titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+\makechapterstyle{box}{
+  \renewcommand*{\printchaptername}{}
+  \renewcommand*{\chapnumfont}{\normalfont\sffamily\huge\bfseries}
+  \renewcommand*{\printchapternum}{
+    \flushright
+    \begin{tikzpicture}
+      \draw[fill,color=black!30] (0,0) rectangle (2cm,2cm);
+      \draw[color=white] (1cm,1cm) node { \chapnumfont\thechapter };
+    \end{tikzpicture}
+  }
+  \renewcommand*{\chaptitlefont}{\normalfont\sffamily\Huge\bfseries}
+  \renewcommand*{\printchaptertitle}[1]{\flushright\chaptitlefont##1}
+}
+\chapterstyle{box}
+%% This won't work with the `babel' package
+%% \renewcommand\chaptername{第~\thechapter~章}
+%% We have to use the following fix
+%% w/o using the babel package
+%% \renewcommand{\figurename}{\kai 图}
+%% w/ babel packge and English as language
+\addto\captionsenglish{%
+  % \renewcommand\chaptername{第~\thechapter~章}
+  \renewcommand\chaptername{}
+  \renewcommand\contentsname{目~~~~录}
+  \renewcommand\tablename{表}
+  \renewcommand\figurename{图}
+  \renewcommand\figurename{\kai 图}  
+}
+% Or use the following
+% \AtBeginDocument{%
+%   \renewcommand\tablename{表}
+% }
+
+% % patch \newtheoremstyle to accept \newline<other tokens>
+% \makeatletter
+% \patchcmd{\newtheoremstyle}
+%  {\def\@tempb{\newline}}
+%  {\def\@tempb{\newline}\edef\@tempa{\unexpanded\expandafter{\@car#8\@nil}}}
+%  {}{}
+% \patchcmd{\newtheoremstyle}
+%  {\def\thmheadnl{\newline}}
+%  {\def\thmheadnl{#8}}
+%  {}{}
+% \makeatother
+
+\newtheoremstyle{break}% name
+  {15pt}%      Space above, empty = `usual value'
+  {}%          Space below
+  {\kai}%     Body font
+  {}%         Indent amount (empty = no indent, \parindent = para indent)
+  {\bfseries\hei}% Thm head font
+  {.}%        Punctuation after thm head
+  %{\newline\hspace*{\parindent}}% Space after thm head: \newline = linebreak
+  {5pt plus 1pt minus 1pt}% Space after thm head: \newline = linebreak
+  {}%         Thm head spec
+\theoremstyle{break}
+\newtheorem{theorem}{\hei 定理}[section]
+\newtheorem{example}[theorem]{\hei 例} % Use the same counter as theorem
+\newtheorem{property}[theorem]{\hei 性质} % Use the same counter as theorem
+\newtheorem{question}[theorem]{\hei 题} % Use the same counter as theorem
+\newtheorem{definition}[theorem]{\hei 定义} % Use the same counter as theorem
+\newtheorem{corollary}{\hei 推论}[theorem]  % Reset after every theorem
+\newtheorem{lemma}[theorem]{\hei 引理}  % Use the same counter as theorem
+
+% \renewcommand*{\proofname}{证明}
+\newcommand{\note}{\begingroup\bfseries\kai 注：\endgroup}
+\newcommand{\think}{\begingroup\bfseries\kai 思考：\endgroup}
+\newcommand{\hints}{\begingroup\bfseries\kai 提示：\endgroup}
+
+\newcommand{\kurschak}{K\"ursch\'ak}
+\newcommand{\term}[1]{\begingroup\bfseries\kai{#1}\endgroup}
+
+\DeclareMathOperator{\atan}{atan}
+
+% Change colon(:) in figure caption to period(.)
+\usepackage{caption}
+\captionsetup{labelsep=period}
+
+\newcommand{\norm}[1]{\left\lVert{#1}\right\rVert}
+\renewcommand*{\vec}[1]{\mathbf{#1}}
+
+\newcommand*{\ihat}{\hat{\textbf\i}}
+\newcommand*{\jhat}{\hat{\textbf\j}}
+\newcommand*{\khat}{\hat{\textbf k}}
+
+\renewcommand*{\le}{\leqslant}
+\renewcommand*{\ge}{\geqslant}
+\renewcommand*\labelenumi{(\theenumi)}
+
+% Make proof environemtn skip the first line
+\makeatletter
+\renewenvironment{proof}[1][证明]{\par
+  % \vspace{-\topsep}% remove the space after the theorem, HOWEVER A PROOF ENVIRONMENT NOT PRECEDED BY A THEOREM WILL BE TYPESET WRONGLY.
+  \pushQED{\qed}%
+  \normalfont %\topsep6\p@\@plus6\p@\relax
+  \topsep0pt \partopsep0pt % no space before
+  \trivlist
+  \item[\hskip\labelsep
+    \bfseries \kai%\itshape
+    #1\@addpunct{.}]%\mbox{}\\*% new line after \proofname
+}{%
+  \popQED\endtrivlist\@endpefalse
+}
+\makeatother
+
+% \newcommand*{\max}[1]{\begingroup\mathrm{max}\left(#1\right)\endgroup}
+% \newcommand*{\min}[1]{\mathrm{min}\left(#1\right)}
+
+\usepackage{enumitem}
+% \setlist{nolistsep}
+% \setitemize{labelindent=\parindent,leftmargin=*,align=left,itemindent=2em,noitemsep}%,leftmargin=*,topsep=2pt,partopsep=0pt}
+\setitemize{labelindent=\parindent,leftmargin=*,itemsep=0em,partopsep=0em,parsep=0em,topsep=0em,itemindent=3.75em,align=left}
+\setenumerate{labelindent=\parindent,leftmargin=*,itemsep=0em,partopsep=0em,parsep=0em,topsep=0em,itemindent=3.75em,align=left}
+
+\setitemize[2]{labelindent=\parindent+2em,leftmargin=*,itemsep=0em,partopsep=0em,parsep=0em,topsep=0em,itemindent=5.75em,align=left}
+\setenumerate[2]{labelindent=\parindent+2em,leftmargin=*,itemsep=0em,partopsep=0em,parsep=0em,topsep=0em,itemindent=5.75em,align=left}
+
+
+\renewcommand{\baselinestretch}{1.1}
+\renewcommand*{\arraystretch}{1.5}
+
+% make \arraystrech in pmatrix/vmatrix/bmatrix in amsmath default to .9
+\makeatletter
+\renewcommand*\env@matrix[1][.9]{%
+  \edef\arraystretch{#1}%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{*\c@MaxMatrixCols c}}
+\makeatother
+
+\usepackage{graphicx}%\resizebox
+\graphicspath{{images/}} %Setting the graphicspath
+
+\usepackage[makeroom]{cancel} % for xcancel/cancel/bcancel etc.
+
+\usepackage{fancyvrb}           % for BVerbatim environment
+
+\usepackage{verbatim}
+% Center verbatim environment, with the help from verbatim package
+\makeatletter
+\def\verbatim@font{\normalfont\ttfamily\kai\Large
+  \hyphenchar\font\m@ne
+  \@noligs}
+\makeatother
+\newenvironment{pcontent}{%
+  \par
+  \centering
+  \varwidth{\linewidth}%
+  \verbatim
+}{%
+  \endverbatim
+  \endvarwidth
+  \par\vskip10pt
+}
+
+\newcommand{\ptitle}[1]{\par\vskip20pt{\centering\bfseries\kai\Large{#1}\par}\nopagebreak\vskip5pt\nopagebreak}
+\newcommand{\pauthor}[1]{\par{\centering\kai {#1}\par}\nopagebreak\vskip1pt}
+\newcommand{\premark}[1]{\par\kai\small【注释】{#1}\par\vskip5pt}
+\newcommand{\ppreface}[1]{{\setlength{\parindent}{2em}\small\kai{#1}}\par\vskip5pt}
+
+% \par indent
+\usepackage{indentfirst}
+% parindent to 2 characters
+\setlength{\parindent}{2em}
+\setlength{\parskip}{3pt}
+
+\usepackage{ifthen}             % for \ifelsethen, \whiledo
+% \ifthenelse{CONDITION}{POSITIVE}{NEGATIVE}
+%     2 is an \ifthenelse{\isodd{2}}{ODD}{EVEN} number.
+% \whiledo{CONDITION}{LOOP CONSTRUCT}
+%     \newcounter{X}
+%     \whiledo{\value{X}<10}{\value{X},\stepcounter{X}}
+
+\usepackage{units}              % for \nicefrac command, a slashed fraction
+
+\usepackage{harpoon}            % for \overrightharp
+
+% 3 counters for loops
+\newcounter{X}
+\newcounter{Y}
+\newcounter{Z}
+
+% \include{myconfig}
+
+% 选择题
+\usepackage{multiplechoice}
+
+\usepackage[chapter]{algorithm}          % the float environment
+\usepackage{algorithmic} % algorithmic (NOT algorithmicx) package is suggested for IEEE journals
+\floatname{algorithm}{算法}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\newcommand{\dx}{\,\mathrm{d}x}
+\newcommand{\dy}{\,\mathrm{d}y}
+\newcommand{\dt}{\,\mathrm{d}t}
+
+% \newcommand{\dz}{\mathrm{d}z}
+% \newcommand{\gcd}{\mathrm{gcd}}
+\newcommand{\lcm}{\mathrm{lcm}}
+
+\newcommand{\trianglewithfournumbers}[4]{
+  \coordinate(A) at (0,0);
+  \coordinate(C) at (60:2);
+  \coordinate(B) at (2,0);
+  \coordinate(E) at (60:1);
+  \coordinate(F) at (1,0);
+  \coordinate(D) at ($(E)+(1,0)$);
+  \draw(A)--(B)--(C)--cycle;
+  \draw(D)--(E)--(F)--cycle;
+  \node at ($1/3*(C)+1/3*(E)+1/3*(D)$) {#1};
+  \node at ($1/3*(A)+1/3*(E)+1/3*(F)$) {#2};
+  \node at ($1/3*(B)+1/3*(F)+1/3*(D)$) {#3};
+  \node at ($1/3*(F)+1/3*(E)+1/3*(D)$) {#4};
+}
+
+%%%% 易经符号
+% \newCJKfontfamily{\symbolazh}{Symbola} % this font has the required I Ching glyphs
+\xeCJKsetcharclass{"4DC0}{"4DFF}{0} % set Yijing Hexagrams Symbols as non-CJK characters, otherwise one has to use the \symbolazh command instead
+\newfontface{\symbola}{Symbola}
+
+% 两仪
+\newcommand{\yangyao}{{\symbola\char\numexpr"268A}}
+\newcommand{\yinyao}{{\symbola\char\numexpr"268B}}
+% 四象
+\newcommand{\taiyang}{{\symbola\char\numexpr"268C}}
+\newcommand{\shaoyin}{{\symbola\char\numexpr"268D}}
+\newcommand{\shaoyang}{{\symbola\char\numexpr"268E}}
+\newcommand{\taiyin}{{\symbola\char\numexpr"268F}}
+% 八卦 0-7
+\newcommand{\trigram}[1]{{\symbola\char\numexpr"2630+#1}}
+% 六十四卦 0-63
+\newcommand{\iching}[1]{{\symbola\char\numexpr"4DC0+#1}}
+
+
+% comment this when compile the whole document
+% \includeonly{basic-operation}
+% \includeonly{basic-inequalities}
+% \includeonly{proofs-without-words}
+% \includeonly{golden-ratio}
+% \includeonly{area}
+% \includeonly{five-models}
+% \includeonly{logic}
+% \includeonly{geometry}
+% \includeonly{graphs-of-functions}
+% \includeonly{proofs-without-words}
+% \includeonly{board-coverage}
+% \includeonly{graphs}
+% \includeonly{traps}
+% \includeonly{intuition}
+% \includeonly{introduction}
+% \includeonly{monotonic-functions}
+% \includeonly{algorithm}
+% \includeonly{magic-square}
+% \includeonly{geometric-inequality}
+% \includeonly{number-theory}
+% \includeonly{continued-fraction}
+% \includeonly{calendar}
+% \includeonly{diophantine-equation}
+% \includeonly{methods}
+% \includeonly{numerical-method}
+% \includeonly{identities}
+% \includeonly{nim-game}
+% \includeonly{cover}
+% \includeonly{infinite-series}
+% \includeonly{tricks}
+% \includeonly{game}
+% \includeonly{pattern}
+% \includeonly{insight}
+% \includeonly{inequality}
+% \includeonly{trigonometric-functions}
+% \includeonly{set}
+% \includeonly{area}
+% \includeonly{discrete}
+% \includeonly{fun}
+% \includeonly{dp}
+% \includeonly{matrix}
+% \includeonly{color}
+% \includeonly{fractal}
+% \includeonly{genius-solution-from-the-book}
+% \includeonly{genius-solution}
+% \includeonly{math-by-physics}
+% \includeonly{probability}
+% \includeonly{circle}
+% \includeonly{number-to-graph}
+
+% allow page break inside align environment
+\allowdisplaybreaks
+\begin{document}
+
+%\hypersetup{CJKbookmarks=true}  %for \overline in section, NOT WORK!!
+
+\frontmatter
+\include{cover}
+
+%% Remvoe the self reference of tableofcontents
+\currentpdfbookmark{\contentsname}{tableofcontents}
+\tableofcontents*
+% \begin{KeepFromToc}
+%   \tableofcontents
+% \end{KeepFromToc}
+
+\mainmatter
+
+\chapter{脍炙人口的诗词选}
+\label{chap:mao}
+
+\clearpage
+
+% enlarge character spacing
+% default: {\hskip 0pt plus 0.08\baselineskip}
+\renewcommand{\CJKglue}{\hskip 1pt plus 0.08\baselineskip}
+
+\include{db}
+
+\end{document}
+

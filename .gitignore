@@ -1,3 +1,7 @@
+# master.pdf
+master.pdf
+*.sort
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
