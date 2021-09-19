@@ -87,6 +87,11 @@ print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
 $empty = 0;
 while(<>){
   s/^[ \t\r\n]+|[ \t\r\n]+$//g;
+  if (/^#RAW[ \t]+(.*)[ \t\r\n]*$/) {
+    print("$1\n");
+    next;
+  }
+  
   next if /^#/; # ignore lines start with #
   if (/^$/) {
     $empty += 1;
